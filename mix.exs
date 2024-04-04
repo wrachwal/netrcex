@@ -13,7 +13,7 @@ defmodule Netrc.Mixfile do
       ],
      description: "Read netrc files",
      test_coverage: [tool: ExCoveralls],
-     deps: deps]
+     deps: deps()]
   end
 
   # Configuration for the OTP application

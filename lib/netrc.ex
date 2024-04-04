@@ -9,7 +9,7 @@ defmodule Netrc do
   iex> Netrc.read("test/data/sample.netrc")
   %{"m" => %{"login" => "l", "password" => "p"}}
   """
-  def read(path \\ default_path) do
+  def read(path \\ default_path()) do
     {:ok, file_stat} = File.stat(path)
     unless (file_stat.mode &&& 0o777) == 0o600 do
       raise Netrc.Error, message: "'#{path}' permission should be 0600"
@@ -22,16 +22,15 @@ defmodule Netrc do
   defp default_path do
     filename = case :os.type() do
       {:win32, _} -> "_netrc"
-      _             -> ".netrc"
+      _           -> ".netrc"
     end
     System.user_home |> Path.join(filename)
   end
 
   defp lex(data) do
-    String.split(data, ~r{\r?\n})
-    |> Enum.map(fn(line) ->
-      String.split(line, "#") |> Enum.at(0)
-    end)
+    data
+    |> String.split(~r{\r?\n})
+    |> Enum.reject(&Regex.match?(~r/^\s*#/, &1))
     |> Enum.join(" ")
     |> String.split(~r{\s|\t|\n|\r}, trim: true)
   end
